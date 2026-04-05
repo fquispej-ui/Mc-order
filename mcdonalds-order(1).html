@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>McDonald's — Pedir en Línea</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #DA020E;
+    --yellow: #FFC72C;
+    --dark: #1A1A1A;
+    --card: #FFFFFF;
+    --bg: #F5F0E8;
+    --muted: #7A7A7A;
+    --border: #E0D9CE;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --radius: 16px;
+  }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--red);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(218,2,14,0.3);
+  }
+
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .mc-logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  .brand-text {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 28px;
+    color: var(--yellow);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .cart-badge {
+    background: var(--yellow);
+    color: var(--dark);
+    font-weight: 900;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    white-space: nowrap;
+  }
+  .cart-badge:hover { transform: scale(1.05); }
+
+  /* HERO STRIP */
+  .hero {
+    background: linear-gradient(135deg, var(--yellow) 0%, #FFD966 100%);
+    padding: 28px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='2' fill='%23DA020E' fill-opacity='0.07'/%3E%3C/svg%3E");
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(36px, 8vw, 64px);
+    color: var(--red);
+    letter-spacing: 3px;
+    position: relative;
+  }
+  .hero p {
+    font-size: 14px;
+    color: var(--dark);
+    font-weight: 700;
+    opacity: 0.6;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  /* LAYOUT */
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 800px) {
+    .page { grid-template-columns: 1fr; }
+  }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title span {
+    display: inline-block;
+    width: 8px; height: 28px;
+    background: var(--red);
+    border-radius: 4px;
+  }
+
+  /* CATEGORY TABS */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .tab {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 2px solid var(--border);
+    background: white;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted);
+  }
+  .tab.active, .tab:hover {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+  }
+
+  /* MENU GRID */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .menu-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+  }
+  .menu-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
+  .menu-card.selected { border-color: var(--yellow); }
+  .menu-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--yellow);
+    color: var(--dark);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .menu-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: contain;
+    background: #FFF8E7;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+  }
+
+  .menu-info {
+    padding: 14px;
+  }
+  .menu-name {
+    font-weight: 800;
+    font-size: 15px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .menu-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+  .menu-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .menu-price {
+    font-weight: 900;
+    font-size: 17px;
+    color: var(--red);
+  }
+  .add-btn {
+    background: var(--yellow);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    color: var(--dark);
+  }
+  .add-btn:hover { background: #e6b000; transform: scale(1.05); }
+
+  /* RIGHT PANEL */
+  .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ORDER SUMMARY */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+  }
+
+  .order-list { list-style: none; margin-bottom: 16px; }
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .order-item:last-child { border-bottom: none; }
+  .order-item-left { display: flex; align-items: center; gap: 8px; }
+  .order-qty {
+    background: var(--yellow);
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900;
+    color: var(--dark); flex-shrink: 0;
+  }
+  .remove-btn {
+    background: none; border: none;
+    color: var(--muted); cursor: pointer; font-size: 16px;
+    transition: color 0.15s;
+    padding: 0 4px;
+  }
+  .remove-btn:hover { color: var(--red); }
+
+  .empty-cart {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .empty-cart .empty-icon { font-size: 36px; display: block; margin-bottom: 8px; }
+
+  .totals { margin-top: 8px; }
+  .total-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--muted); margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .total-row.big {
+    font-size: 16px; font-weight: 900; color: var(--dark);
+    border-top: 2px solid var(--border);
+    padding-top: 10px; margin-top: 6px;
+  }
+
+  /* FORM */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+  .field { margin-bottom: 14px; }
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input[type="text"], input[type="email"], input[type="tel"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    background: var(--bg);
+    color: var(--dark);
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+  }
+  input:focus {
+    border-color: var(--yellow);
+    background: white;
+  }
+  input::placeholder { color: #C0BAB0; font-weight: 600; }
+
+  /* CARD INPUT */
+  .card-number-wrap {
+    position: relative;
+  }
+  .card-icons {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 4px;
+    font-size: 18px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 14px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ORDER BUTTON */
+  .order-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(218,2,14,0.35);
+    margin-top: 4px;
+  }
+  .order-btn:hover {
+    background: #b8000b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(218,2,14,0.4);
+  }
+  .order-btn:active { transform: translateY(0); }
+
+  /* CATEGORY SECTION */
+  .category-section { display: none; }
+  .category-section.active { display: block; }
+
+  /* SUCCESS OVERLAY */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.92);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  .overlay.show { display: flex; }
+
+  .success-box {
+    background: linear-gradient(160deg, #fff 60%, #FFF8E7 100%);
+    border-radius: 32px;
+    padding: 52px 44px 44px;
+    text-align: center;
+    max-width: 400px;
+    width: 92%;
+    position: relative;
+    overflow: hidden;
+    animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+    box-shadow: 0 32px 80px rgba(218,2,14,0.35), 0 0 0 6px var(--yellow);
+  }
+  .success-box::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,199,44,0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+  .success-box::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; right: -50px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(218,2,14,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glowPulse 2.5s ease-in-out infinite reverse;
+  }
+  @keyframes glowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+  @keyframes popIn {
+    0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+    60%  { transform: scale(1.08) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes bounceIn {
+    0%   { transform: translateY(-30px) scale(0.5); opacity: 0; }
+    60%  { transform: translateY(8px) scale(1.15); }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-5deg); }
+    50%      { transform: rotate(5deg); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .success-burger {
+    font-size: 80px;
+    display: block;
+    margin-bottom: 8px;
+    animation: bounceIn 0.6s 0.25s cubic-bezier(0.175,0.885,0.32,1.275) both, wiggle 1.5s 0.9s ease-in-out 3;
+    position: relative; z-index: 1;
+  }
+  .success-box h2 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+    background: linear-gradient(90deg, var(--red) 0%, #FF6B35 40%, var(--red) 80%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2.5s linear infinite, fadeSlideUp 0.5s 0.4s both;
+  }
+  .success-msg-text {
+    color: #444;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    position: relative; z-index: 1;
+    animation: fadeSlideUp 0.5s 0.55s both;
+  }
+  .success-close {
+    background: linear-gradient(135deg, var(--yellow) 0%, #FFD966 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 16px 40px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 17px;
+    cursor: pointer;
+    color: var(--dark);
+    position: relative; z-index: 1;
+    box-shadow: 0 6px 20px rgba(255,199,44,0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+    animation: fadeSlideUp 0.5s 0.7s both;
+  }
+  .success-close:hover {
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 10px 28px rgba(255,199,44,0.6);
+  }
+
+  /* CONFETTI CANVAS */
+  #confetti-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 199;
+    display: none;
+  }
+  #confetti-canvas.show { display: block; }
+
+  /* SECURE BADGE */
+  .secure-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <!-- McDonald's M logo SVG -->
+    <svg class="mc-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="50" fill="#FFC72C"/>
+      <path d="M18 72 L18 28 Q18 20 26 20 Q34 20 34 28 L34 55 Q34 62 50 62 Q66 62 66 55 L66 28 Q66 20 74 20 Q82 20 82 28 L82 72 L70 72 L70 55 Q70 70 50 70 Q30 70 30 55 L30 72 Z"
+            fill="#DA020E"/>
+    </svg>
+    <div>
+      <div class="brand-text">McDonald's</div>
+      <div class="brand-sub">Pedir en Línea</div>
+    </div>
+  </div>
+  <div class="cart-badge" onclick="scrollToOrder()">🛒 Ver Pedido</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>¿Qué se te antoja?</h1>
+  <p>Fresco • Rápido • Hecho para ti</p>
+</div>
+
+<!-- PAGE LAYOUT -->
+<div class="page">
+
+  <!-- LEFT: MENU -->
+  <div>
+    <div class="section-title"><span></span>Nuestro Menú</div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showCategory('burgers', this)">🍔 Hamburguesas</div>
+      <div class="tab" onclick="showCategory('chicken', this)">🍗 Pollo</div>
+      <div class="tab" onclick="showCategory('sides', this)">🍟 Acompañamientos</div>
+      <div class="tab" onclick="showCategory('drinks', this)">🥤 Bebidas</div>
+      <div class="tab" onclick="showCategory('desserts', this)">🍦 Postres</div>
+    </div>
+
+    <!-- HAMBURGUESAS -->
+    <div class="category-section active" id="cat-burgers">
+      <div class="menu-grid">
+        <div class="menu-card" onclick="addItem('Big Mac', 3050)">
+          <div class="menu-img">🍔</div>
+          <div class="menu-info">
+            <div class="menu-name">Big Mac</div>
+            <div class="menu-desc">Dos filetes de carne, salsa especial, lechuga, queso, pepinillos y cebolla</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡3.050</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Cuarto de Libra', 3300)">
+          <div class="menu-img">🍔</div>
+          <div class="menu-info">
+            <div class="menu-name">Cuarto de Libra con Queso</div>
+            <div class="menu-desc">Filete de carne fresca, dos rebanadas de queso, cebolla, pepinillos, mostaza y cátsup</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡3.300</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Doble Cheeseburger', 2030)">
+          <div class="menu-img">🍔</div>
+          <div class="menu-info">
+            <div class="menu-name">Doble Cheeseburger</div>
+            <div class="menu-desc">Dos filetes de carne con queso americano derretido, pepinillos, cebolla, cátsup y mostaza</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡2.030</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('McDoble', 1525)">
+          <div class="menu-img">🍔</div>
+          <div class="menu-info">
+            <div class="menu-name">McDoble</div>
+            <div class="menu-desc">Dos filetes de carne, una rebanada de queso, cebolla, pepinillos, mostaza y cátsup</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.525</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLLO -->
+    <div class="category-section" id="cat-chicken">
+      <div class="menu-grid">
+        <div class="menu-card" onclick="addItem('McPollo', 1270)">
+          <div class="menu-img">🍗</div>
+          <div class="menu-info">
+            <div class="menu-name">McPollo</div>
+            <div class="menu-desc">Filete de pollo crujiente con mayonesa y lechuga rallada en un pan tostado</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.270</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Sándwich de Pollo Crujiente', 2700)">
+          <div class="menu-img">🥪</div>
+          <div class="menu-info">
+            <div class="menu-name">Sándwich de Pollo Crujiente</div>
+            <div class="menu-desc">Filete de pollo crujiente, pepinillos rizados y mantequilla en un pan de papa</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡2.700</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('McNuggets 10 pzas', 2290)">
+          <div class="menu-img">🍗</div>
+          <div class="menu-info">
+            <div class="menu-name">McNuggets 10 piezas</div>
+            <div class="menu-desc">Tiernos nuggets de pollo elaborados con carne blanca, perfectos con tu salsa favorita</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡2.290</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Sándwich Picante Deluxe', 2950)">
+          <div class="menu-img">🌶️</div>
+          <div class="menu-info">
+            <div class="menu-name">Sándwich Picante Deluxe</div>
+            <div class="menu-desc">Pollo crujiente picante, queso con pimienta, lechuga, tomate y mayonesa</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡2.950</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACOMPAÑAMIENTOS -->
+    <div class="category-section" id="cat-sides">
+      <div class="menu-grid">
+        <div class="menu-card" onclick="addItem('Papas Medianas', 1475)">
+          <div class="menu-img">🍟</div>
+          <div class="menu-info">
+            <div class="menu-name">Papas Medianas</div>
+            <div class="menu-desc">Las mundialmente famosas papas doradas y crujientes, perfectamente saladas</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.475</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Papas Grandes', 1730)">
+          <div class="menu-img">🍟</div>
+          <div class="menu-info">
+            <div class="menu-name">Papas Grandes</div>
+            <div class="menu-desc">Porción extra grande de las mundialmente famosas papas doradas</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.730</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Ensalada Individual', 1630)">
+          <div class="menu-img">🥗</div>
+          <div class="menu-info">
+            <div class="menu-name">Ensalada Individual</div>
+            <div class="menu-desc">Mezcla fresca de lechuga, espinaca baby, zanahoria y tomates cherry</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.630</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Gajos de Manzana', 760)">
+          <div class="menu-img">🍎</div>
+          <div class="menu-info">
+            <div class="menu-name">Gajos de Manzana</div>
+            <div class="menu-desc">Gajos de manzana fresca, una opción más ligera como acompañamiento</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡760</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BEBIDAS -->
+    <div class="category-section" id="cat-drinks">
+      <div class="menu-grid">
+        <div class="menu-card" onclick="addItem('Refresco Mediano', 1015)">
+          <div class="menu-img">🥤</div>
+          <div class="menu-info">
+            <div class="menu-name">Refresco Mediano</div>
+            <div class="menu-desc">Tu elección de Coca-Cola, Coca Light, Sprite, Fanta o Dr Pepper</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.015</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('McCafé Latte', 1935)">
+          <div class="menu-img">☕</div>
+          <div class="menu-info">
+            <div class="menu-name">McCafé Latte</div>
+            <div class="menu-desc">Espresso suave con leche entera recién vaporizada, perfectamente equilibrado</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.935</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Malteada de Chocolate', 2035)">
+          <div class="menu-img">🥛</div>
+          <div class="menu-info">
+            <div class="menu-name">Malteada de Chocolate</div>
+            <div class="menu-desc">Rica y cremosa malteada de chocolate preparada con lácteos de verdad</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡2.035</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Jugo de Naranja', 1270)">
+          <div class="menu-img">🍊</div>
+          <div class="menu-info">
+            <div class="menu-name">Jugo de Naranja</div>
+            <div class="menu-desc">Jugo de naranja 100% natural exprimido, sin pulpa</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.270</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POSTRES -->
+    <div class="category-section" id="cat-desserts">
+      <div class="menu-grid">
+        <div class="menu-card" onclick="addItem('McFlurry Oreo', 1935)">
+          <div class="menu-img">🍦</div>
+          <div class="menu-info">
+            <div class="menu-name">McFlurry® Oreo</div>
+            <div class="menu-desc">Helado suave de vainilla con trozos de galleta Oreo desmoronada</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.935</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Sundae de Chocolate', 1170)">
+          <div class="menu-img">🍨</div>
+          <div class="menu-info">
+            <div class="menu-name">Sundae de Chocolate</div>
+            <div class="menu-desc">Helado suave de vainilla bañado con salsa caliente de chocolate</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡1.170</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Pay de Manzana', 760)">
+          <div class="menu-img">🥧</div>
+          <div class="menu-info">
+            <div class="menu-name">Pay de Manzana al Horno</div>
+            <div class="menu-desc">Masa hojaldrada y tibia rellena de dulce manzana con canela</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡760</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card" onclick="addItem('Galleta de Chispas de Chocolate', 560)">
+          <div class="menu-img">🍪</div>
+          <div class="menu-info">
+            <div class="menu-name">Galleta de Chispas de Chocolate</div>
+            <div class="menu-desc">Galleta recién horneada y tibia con chispas de chocolate</div>
+            <div class="menu-footer">
+              <span class="menu-price">₡560</span>
+              <button class="add-btn">+ Agregar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: ORDER PANEL -->
+  <div class="right-panel" id="order-section">
+
+    <!-- ORDER SUMMARY -->
+    <div class="card">
+      <div class="section-title" style="font-size:20px; margin-bottom:12px;"><span></span>Tu Pedido</div>
+      <ul class="order-list" id="order-list">
+        <li class="empty-cart" id="empty-msg">
+          <span class="empty-icon">🛍️</span>
+          ¡Agrega productos del menú para comenzar!
+        </li>
+      </ul>
+      <div class="totals" id="totals" style="display:none;">
+        <div class="total-row"><span>Subtotal</span><span id="subtotal">₡0</span></div>
+        <div class="total-row"><span>Impuesto (13%)</span><span id="tax">₡0</span></div>
+        <div class="total-row"><span>Envío</span><span>₡1.530</span></div>
+        <div class="total-row big"><span>Total</span><span id="total">₡0</span></div>
+      </div>
+    </div>
+
+    <!-- PERSONAL INFO -->
+    <div class="card">
+      <div class="section-title" style="font-size:20px; margin-bottom:16px;"><span></span>Tus Datos</div>
+      <div class="form-row">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" id="fname" placeholder="Juan">
+        </div>
+        <div class="field">
+          <label>Apellido</label>
+          <input type="text" id="lname" placeholder="Pérez">
+        </div>
+      </div>
+      <div class="field">
+        <label>Correo Electrónico</label>
+        <input type="email" id="email" placeholder="juan@correo.com">
+      </div>
+      <div class="field">
+        <label>Número de Teléfono</label>
+        <input type="tel" id="phone" placeholder="+506 8888-0000">
+      </div>
+      <div class="field">
+        <label>Dirección de Entrega</label>
+        <input type="text" id="address" placeholder="Calle 1, Barrio, Ciudad">
+      </div>
+    </div>
+
+    <!-- PAYMENT INFO -->
+    <div class="card">
+      <div class="section-title" style="font-size:20px; margin-bottom:16px;"><span></span>Pago</div>
+
+      <div class="field">
+        <label>Nombre en la Tarjeta</label>
+        <input type="text" id="card-name" placeholder="Juan Pérez">
+      </div>
+
+      <div class="field">
+        <label>Número de Tarjeta</label>
+        <div class="card-number-wrap">
+          <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+          <div class="card-icons">💳</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha de Vencimiento</label>
+          <input type="text" id="expiry" placeholder="MM / AA" maxlength="7" oninput="formatExpiry(this)">
+        </div>
+        <div class="field">
+          <label>CVV</label>
+          <input type="text" id="cvv" placeholder="•••" maxlength="3">
+        </div>
+      </div>
+
+      <button class="order-btn" onclick="placeOrder()">🍔 Realizar Pedido</button>
+
+      <div class="secure-note">
+        🔒 Protegido con cifrado SSL de 256 bits
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- SUCCESS OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="success-box">
+    <span class="success-burger">🍔</span>
+    <h2>¡Pedido Confirmado!</h2>
+    <p class="success-msg-text">Gracias por tu orden,<br>pronto recibirás tu pedido. 🚗💨</p>
+    <button class="success-close" onclick="closeOverlay()">¡Genial, gracias!</button>
+  </div>
+</div>
+
+<script>
+  let cart = {};
+
+  function fmtCRC(n) {
+    return '₡' + Math.round(n).toLocaleString('es-CR');
+  }
+
+  function addItem(name, price) {
+    if (cart[name]) {
+      cart[name].qty++;
+    } else {
+      cart[name] = { price, qty: 1 };
+    }
+    renderCart();
+    const btn = event.currentTarget.querySelector('.add-btn');
+    if (btn) {
+      btn.textContent = '✓ Agregado';
+      btn.style.background = '#27ae60';
+      btn.style.color = 'white';
+      setTimeout(() => {
+        btn.textContent = '+ Agregar';
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 800);
+    }
+  }
+
+  function removeItem(name) {
+    if (cart[name].qty > 1) cart[name].qty--;
+    else delete cart[name];
+    renderCart();
+  }
+
+  function renderCart() {
+    const list = document.getElementById('order-list');
+    const totalsEl = document.getElementById('totals');
+    list.innerHTML = '';
+
+    const keys = Object.keys(cart);
+    if (keys.length === 0) {
+      list.innerHTML = '<li class="empty-cart" id="empty-msg"><span class="empty-icon">🛍️</span>¡Agrega productos del menú para comenzar!</li>';
+      totalsEl.style.display = 'none';
+      return;
+    }
+
+    totalsEl.style.display = 'block';
+    let subtotal = 0;
+
+    keys.forEach(name => {
+      const { price, qty } = cart[name];
+      subtotal += price * qty;
+      const li = document.createElement('li');
+      li.className = 'order-item';
+      li.innerHTML = `
+        <div class="order-item-left">
+          <span class="order-qty">${qty}</span>
+          <span>${name}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-weight:900; color:var(--red);">${fmtCRC(price * qty)}</span>
+          <button class="remove-btn" onclick="removeItem('${name}')">✕</button>
+        </div>
+      `;
+      list.appendChild(li);
+    });
+
+    const tax = subtotal * 0.13;
+    const total = subtotal + tax + 1530;
+    document.getElementById('subtotal').textContent = fmtCRC(subtotal);
+    document.getElementById('tax').textContent = fmtCRC(tax);
+    document.getElementById('total').textContent = fmtCRC(total);
+  }
+
+  function showCategory(cat, el) {
+    document.querySelectorAll('.category-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('cat-' + cat).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function formatCard(input) {
+    let v = input.value.replace(/\D/g, '').substring(0, 16);
+    input.value = v.match(/.{1,4}/g)?.join(' ') || v;
+  }
+
+  function formatExpiry(input) {
+    let v = input.value.replace(/\D/g, '').substring(0, 4);
+    if (v.length >= 3) v = v.substring(0,2) + ' / ' + v.substring(2);
+    input.value = v;
+  }
+
+  function scrollToOrder() {
+    document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* ── CONFETTI ── */
+  const COLORS = ['#DA020E','#FFC72C','#ffffff','#FF6B35','#FFD966','#27ae60'];
+  let confettiParticles = [], confettiRAF = null;
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    canvas.classList.add('show');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    confettiParticles = [];
+
+    for (let i = 0; i < 160; i++) {
+      confettiParticles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -200 - 10,
+        w: Math.random() * 12 + 6,
+        h: Math.random() * 6 + 3,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.15,
+        vx: (Math.random() - 0.5) * 3,
+        vy: Math.random() * 3 + 2,
+        alpha: 1
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      confettiParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.06;
+        p.rot += p.rotSpeed;
+        if (p.y > canvas.height * 0.7) p.alpha -= 0.018;
+        if (p.alpha > 0) alive = true;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      if (alive) confettiRAF = requestAnimationFrame(draw);
+      else { canvas.classList.remove('show'); ctx.clearRect(0,0,canvas.width,canvas.height); }
+    }
+    if (confettiRAF) cancelAnimationFrame(confettiRAF);
+    draw();
+  }
+
+  function placeOrder() {
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const cardNumber = document.getElementById('card-number').value.trim();
+    const cvv = document.getElementById('cvv').value.trim();
+    const expiry = document.getElementById('expiry').value.trim();
+
+    if (Object.keys(cart).length === 0) {
+      alert('¡Por favor agrega al menos un producto a tu pedido!');
+      return;
+    }
+    if (!fname || !lname || !email) {
+      alert('Por favor completa tus datos personales.');
+      return;
+    }
+    if (!cardNumber || cardNumber.length < 19 || !cvv || cvv.length < 3 || !expiry) {
+      alert('Por favor ingresa datos de pago válidos.');
+      return;
+    }
+
+    document.getElementById('overlay').classList.add('show');
+    launchConfetti();
+  }
+
+  function closeOverlay() {
+    document.getElementById('overlay').classList.remove('show');
+    if (confettiRAF) cancelAnimationFrame(confettiRAF);
+    document.getElementById('confetti-canvas').classList.remove('show');
+    cart = {};
+    renderCart();
+    document.querySelectorAll('input').forEach(i => i.value = '');
+  }
+</script>
+</body>
+</html>
